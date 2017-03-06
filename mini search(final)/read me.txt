@@ -1,0 +1,8 @@
+####This is a mini search engine in version 1.0
+
+#####Tips:
+ * "mini search.exe" is the executable file of the search engine.
+ * ”mini search.cpp" is the main source code of the search engine.
+ * "stem.h" is the header file of providing stemming filter.
+ * Directory "dict" consists of a "stop words.txt" which includes all stop words in English.
+ * Directory "works" includes all the Shakespeare's set.
