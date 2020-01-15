@@ -1,8 +1,4 @@
 /*
-	使用了C++ STL中的vector容器和hash_map容器。
-	提供了两个搜索模式，一个是根据单词的总频率筛选进入查询的关键词，另一个是根据单词在特定文章中出现的频率来筛选文章内容。
-	不支持短语搜索，短语搜索将分解成若干个单词搜索。
-
 	# Use vector and hash_map in C++ STL.
 	# Provide two searching mode.One is to search accroding to the total frequency of the keyword, and the other is to search according to the 
 	frequency in certain documents.
@@ -20,7 +16,6 @@
 #include "stem.h"
 using namespace std;
 
-//该结构体表征某个单词所在对应文件中的信息
 //to denote the infomation of a word in certain document.
 typedef struct singleFileInfo *singleInfo;
 struct singleFileInfo{
@@ -28,7 +23,6 @@ struct singleFileInfo{
 	vector<int> address;
 };
 
-//word结构体表征某个单词所包含的所有信息
 //to denote the total information of certain word.
 typedef struct word *Word;
 struct word{
@@ -197,14 +191,14 @@ int queryFunc_freq(string keywords,int freq_treshold){
 	if (inv_index.find(lowerword) != inv_index.end()){
 		targetWord = inv_index[lowerword];
 		if (targetWord->frequency < freq_treshold){
-			cout <<">["<<keywords << "]出现频率过少"<<endl;
+			cout <<">["<<keywords << "]"<<endl;
 			return 0;
 		}
-		cout <<">["<< keywords<<"]总共出现了：" << targetWord->frequency << " 次。" << endl;
+		cout <<">["<< keywords<<"]" << targetWord->frequency << " " << endl;
 		for (int i = 0; i < targetWord->info.size(); i++){
 			info = targetWord->info[i];
 			fileName = info->file;
-			cout << ">[" << keywords << "]在" << fileName << "中出现的位置为：";
+			cout << ">[" << keywords << "]" << fileName << "";
 			for (int j = 0; j < info->address.size(); j++){
 				cout << info->address[j] << " ";
 			}
@@ -213,13 +207,13 @@ int queryFunc_freq(string keywords,int freq_treshold){
 		flag = 1;
 	}
 	if(!flag){
-		cout << ">" << "没有查找到包含[" << keywords << "]的文档" << endl;
+		cout << ">" << "[" << keywords << "]" << endl;
 	}
 
 	return flag;
 }
 
-//根据文档权重筛选，只返回包含关键词频率较高的文档
+//锟斤拷锟斤拷锟侥碉拷权锟斤拷筛选锟斤拷只锟斤拷锟截帮拷锟斤拷锟截硷拷锟斤拷频锟绞较高碉拷锟侥碉拷
 //filter by documents which include high frequency of keywords.
 int queryFunc_doc(string keywords,int doc_freq){
 	Word targetWord;
@@ -234,16 +228,16 @@ int queryFunc_doc(string keywords,int doc_freq){
 	if (inv_index.find(lowerword) != inv_index.end()){
 		targetWord = inv_index[lowerword];
 		if (targetWord->frequency < doc_freq){
-			cout << ">[" << keywords << "]出现频率过少" << endl;
+			cout << ">[" << keywords << "]" << endl;
 			return 0;
 		}
 
-		cout << ">[" << keywords << "]总共出现了：" << targetWord->frequency << " 次。" << endl;
+		cout << ">[" << keywords << "]" << targetWord->frequency << " " << endl;
 		for (int i = 0; i < targetWord->info.size(); i++){
 			info = targetWord->info[i];
 			fileName = info->file;
 			if (info->address.size() >= doc_freq){
-				cout << ">[" << keywords << "]在" << fileName << "中出现的位置为：";
+				cout << ">[" << keywords << "]" << fileName << "";
 				for (int j = 0; j < info->address.size(); j++){
 					cout << info->address[j] << " ";
 				}
@@ -253,7 +247,7 @@ int queryFunc_doc(string keywords,int doc_freq){
 		flag = 1;
 	}
 	if (!flag){
-		cout << ">" << "没有查找到包含[" << keywords << "]的文档" << endl;
+		cout << ">" << "[" << keywords << "]" << endl;
 	}
 
 	return flag;
@@ -290,21 +284,17 @@ int main(){
 	int freq_threshold = 1, //weight of words. (mode 1)
 		doc_threshold = 1;//weight of documents. (mode 2)
 
-	cout<<"倒排索引建立中..."<<endl;
 	createWordDic();
-	cout<<"倒排索引建立完成"<<endl;
 
 	while (1){
 		cout << endl;
-		cout << "请输入搜索模式： 1、单词频率筛选   2、文档权重筛选" << endl;
 		cin >> mode;
 		getchar(); //to delete the "enter"
 		getRes = 0; //to mark whether there is searching result
 
 		//mode 1
 		if (mode == 1){
-			cout << "notice:总频次少于[" << freq_threshold << "]的单词将不会返回结果。" << endl;
-			cout << "请输入需要查找的单词：";
+
 			getline(cin, keywords);
 			split(keywords);
 			for (m = 0; wordsArr[m]!= ""; m++){
@@ -312,11 +302,9 @@ int main(){
 					getRes = 1;
 			}
 			if (getRes){
-				cout << "请选择：1、打开相应文件  2、继续搜索" << endl;
 				cin >> choice;
 				getchar();
 				if (choice == 1){
-					cout << "请输入相应的文件名：";
 					getline(cin, fileName);
 					ifstream fp("works/" + fileName, ifstream::in | ifstream::binary);
 					if (fp.is_open()){
@@ -326,7 +314,6 @@ int main(){
 						}
 					}
 					else{
-						cout << "无法打开指定文件，请确认后再试。";
 					}
 					cout << endl;
 				}
@@ -335,8 +322,6 @@ int main(){
 		}
 		// mode 2
 		else{
-			cout << "notice:将不会返回包含关键词少于[" << doc_threshold << "]次的文档。" << endl;
-			cout << "请输入需要查找的单词：";
 			getline(cin, keywords);
 			split(keywords);
 			for (m = 0; wordsArr[m] != ""; m++){
@@ -344,11 +329,9 @@ int main(){
 					getRes = 1;
 			}
 			if (getRes){
-				cout << "请选择：1、打开相应文件  2、继续搜索" << endl;
 				cin >> choice;
 				getchar();
 				if (choice == 1){
-					cout << "请输入相应的文件名：";
 					getline(cin, fileName);
 					ifstream fp("works/" + fileName, ifstream::in | ifstream::binary);
 					if (fp.is_open()){
@@ -358,7 +341,6 @@ int main(){
 						}
 					}
 					else{
-						cout << "无法打开指定文件，请确认后再试。";
 					}
 					cout << endl;
 				}
